@@ -41,7 +41,7 @@ Services exposed through Skupper:
 
 ```
 
-skupper service create skupperrabbitmq 5672 45672 15672 4369 --mapping tcp
+skupper service create skupperrabbitmq 5672 25672 15672 4369 --mapping tcp
 
 skupper service bind skupperrabbitmq deployment skupper-rabbit-0 
 skupper service bind skupperrabbitmq deployment skupper-rabbit-1
