@@ -1,0 +1,71 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: new-ocp3-rabbitmq-config
+data:
+  advanced.config: >
+    [
+    {rabbit, [{quorum_cluster_size, 5},
+              {quorum_commands_soft_limit, 512}]}
+    ].
+  rabbitmq.conf: >
+    ## Username and password
+
+    ##
+
+    default_user = user
+
+    default_pass = testing
+
+    # Clustering
+
+    #
+
+    cluster_formation.peer_discovery_backend     = classic_config
+
+    cluster_formation.classic_config.nodes.1 = rabbit@skupper-rabbit-0
+
+    cluster_formation.classic_config.nodes.2 = rabbit@skupper-rabbit-1
+
+    cluster_formation.classic_config.nodes.3 = rabbit@skupper-rabbit-2
+
+    cluster_formation.classic_config.nodes.4 = rabbit@skupper-rabbit-3
+  
+    cluster_formation.classic_config.nodes.5 = rabbit@skupper-rabbit-4
+
+
+    cluster_formation.node_cleanup.interval = 120
+
+    #cluster_partition_handling = autoheal
+
+    cluster_partition_handling = pause_if_all_down
+
+
+    # ## Recovery strategy. Can be either 'autoheal' or 'ignore'
+
+    cluster_partition_handling.pause_if_all_down.recover = autoheal
+
+
+    # ## Node names to check
+
+    cluster_partition_handling.pause_if_all_down.nodes.1 =
+    rabbit@skupper-rabbit-0
+
+    cluster_partition_handling.pause_if_all_down.nodes.2 =
+    rabbit@skupper-rabbit-2
+
+    # cluster_formation.node_cleanup.only_log_warning = true
+
+    # queue master locator
+
+    queue_master_locator = min-masters
+
+    # enable guest user
+
+    loopback_users.guest = false
+
+    #default_vhost = wdservices-dev1-vhost
+
+    #disk_free_limit.absolute = 50MB
+
+    #load_definitions = /app/load_definition.json

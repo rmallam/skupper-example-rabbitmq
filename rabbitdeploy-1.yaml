@@ -1,0 +1,134 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: skupper-rabbit-1
+  name: skupper-rabbit-1
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: skupper-rabbit-1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: skupper-rabbit-1
+        cluster: rabbitmq
+    spec:
+      containers:
+      - env:
+          - name: BITNAMI_DEBUG
+            value: 'true'
+          - name: MY_POD_IP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.podIP
+          - name: MY_POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: MY_POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: K8S_SERVICE_NAME
+            value: skupper-rabbit-1
+          - name: K8S_ADDRESS_TYPE
+            value: hostname
+          - name: RABBITMQ_NODE_NAME
+            value: "rabbit@$(K8S_SERVICE_NAME)"
+          - name: RABBITMQ_FORCE_BOOT
+            value: 'no'
+          - name: K8S_HOSTNAME_SUFFIX
+            value: .$(K8S_SERVICE_NAME)
+          - name: RABBITMQ_MNESIA_DIR
+            value: /bitnami/rabbitmq/mnesia/$(RABBITMQ_NODE_NAME)
+          - name: RABBITMQ_LDAP_ENABLE
+            value: 'no'
+          - name: RABBITMQ_LOGS
+            value: '-'
+          - name: RABBITMQ_ULIMIT_NOFILES
+            value: '65536'
+          - name: RABBITMQ_USE_LONGNAME
+            value: 'false'
+          - name: RABBITMQ_ERL_COOKIE
+            value: testing
+          - name: RABBITMQ_LOAD_DEFINITIONS
+            value: 'no'
+          - name: RABBITMQ_SECURE_PASSWORD
+            value: 'yes'
+          - name: RABBITMQ_USERNAME
+            value: user
+          - name: RABBITMQ_PASSWORD
+            value: testing
+          - name: RABBITMQ_PLUGINS
+            value: >-
+              rabbitmq_management
+        image: rabbitmq:3.9.13-debian-10-r31
+        imagePullPolicy: Always
+        name: skupper-rabbit-1
+        lifecycle:
+          postStart:
+            exec:
+              command:
+                - /bin/sh
+                - '-c'
+                - >
+                  until rabbitmqctl --erlang-cookie ${RABBITMQ_ERL_COOKIE}
+                  status; do sleep 10; done; if [[ $(rabbitmqctl
+                  cluster_status | awk '/running_nodes/,/}/' | grep -v
+                  running_nodes | wc -l) -gt 1 ]]; then 
+                    rabbitmqctl --erlang-cookie ${RABBITMQ_ERL_COOKIE} set_policy ha-all ".*" '{"ha-mode":"all"}'
+                  fi
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        ports:
+          - containerPort: 5672
+            name: amqp
+            protocol: TCP
+          - containerPort: 25672
+            name: dist
+            protocol: TCP
+          - containerPort: 15672
+            name: stats
+            protocol: TCP
+          - containerPort: 4369
+            name: epmd
+            protocol: TCP
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+          - name: configuration
+            mountPath: /bitnami/rabbitmq/conf/rabbitmq.conf
+            subPath: rabbitmq.conf
+          - name: configuration
+            mountPath: /bitnami/rabbitmq/conf/advanced.config
+            subPath: advanced.config
+          - mountPath: /bitnami/rabbitmq/mnesia
+            name: data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: configuration
+          configMap:
+            name: new-ocp3-rabbitmq-config
+            defaultMode: 420
+          name: configuration
+        - name: data
+          persistentVolumeClaim:
+            claimName: skupper-rabbit-1
