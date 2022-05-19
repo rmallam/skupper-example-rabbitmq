@@ -65,5 +65,3 @@ oc expose svc skupperrabbitmq
 Login to the stats page using the URL from Cluster1 or 2, to view the state of the cluser with 
 username:  user
 password: testing
-
-
