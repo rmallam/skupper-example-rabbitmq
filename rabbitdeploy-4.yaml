@@ -1,6 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+    skupper.io/address: "skupper-rabbit-4"
+    skupper.io/port: "5672,25672,15672,4369"
+    skupper.io/proxy: "tcp"
   labels:
     app: skupper-rabbit-4
   name: skupper-rabbit-4

@@ -17,14 +17,11 @@ Rabbit MQ classic_config has been used to get this working(https://www.rabbitmq.
 ```
 oc apply -f skupper-rabbit-configmap.yaml
 oc apply -f rabbitdeploy-0.yaml
-skupper expose deployment skupper-rabbit-0
 oc apply -f rabbitdeploy-1.yaml
-skupper expose deployment skupper-rabbit-1
 oc apply -f rabbitdeploy-2.yaml
-skupper expose deployment skupper-rabbit-2
 ```
 
-if you run "skupper service status", you will notice the services skupper-rabbit-0, skupper-rabbit-1, skupper-rabbit-2 created and binded to their respective deployments.
+if you run "skupper service status", you will notice the services skupper-rabbit-0, skupper-rabbit-1, skupper-rabbit-2 created and binded to their respective deployments. 
 
 ```
 $skupper service status
@@ -40,7 +37,7 @@ Services exposed through Skupper:
       ╰─ app=skupper-rabbit-2 name=skupper-rabbit-2
 
 ```
-
+```
 skupper service create skupperrabbitmq 5672 45672 15672 4369 --mapping tcp
 
 skupper service bind skupperrabbitmq deployment skupper-rabbit-0 
@@ -57,7 +54,8 @@ oc apply -f rabbitdeploy-3.yaml
 skupper expose deployment skupper-rabbit-3
 oc apply -f rabbitdeploy-4.yaml
 skupper expose deployment skupper-rabbit-4
-
+```
+```
 skupper service bind skupperrabbitmq deployment skupper-rabbit-3
 skupper service bind skupperrabbitmq deployment skupper-rabbit-4
 oc expose svc skupperrabbitmq
