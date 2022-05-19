@@ -43,7 +43,7 @@ skupper service create skupperrabbitmq 5672 45672 15672 4369 --mapping tcp
 skupper service bind skupperrabbitmq deployment skupper-rabbit-0 
 skupper service bind skupperrabbitmq deployment skupper-rabbit-1
 skupper service bind skupperrabbitmq deployment skupper-rabbit-2
-oc expose svc skupperrabbitmq
+oc expose svc skupperrabbitmq 
 ```
 
 ### On Cluster 2
@@ -51,14 +51,12 @@ oc expose svc skupperrabbitmq
 oc apply -f skupper-rabbit-configmap.yaml
 
 oc apply -f rabbitdeploy-3.yaml
-skupper expose deployment skupper-rabbit-3
 oc apply -f rabbitdeploy-4.yaml
-skupper expose deployment skupper-rabbit-4
 ```
 ```
 skupper service bind skupperrabbitmq deployment skupper-rabbit-3
 skupper service bind skupperrabbitmq deployment skupper-rabbit-4
-oc expose svc skupperrabbitmq
+oc expose svc skupperrabbitmq 
 ```
 
 
